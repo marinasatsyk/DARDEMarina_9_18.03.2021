@@ -23,7 +23,7 @@ export const modal = () => (`
 
 export default (bill) => {
 
-  return (`
+    return (`
     <div class="container dashboard-form" data-testid="dashboard-form">
       <div class="row">
         <div class="col-sm" id="dashboard-form-col1">

@@ -25,7 +25,8 @@ export default class {
         const billUrl = icon.getAttribute("data-bill-url")
         if (billUrl.type != "image/jpg" && billUrl.type != "image/jpeg" && billUrl.type != "image/png") {
             console.log(false)
-                // return
+            console.log(billUrl);
+
         }
         const imgWidth = Math.floor($('#modaleFile').width() * 0.5)
         $('#modaleFile').find(".modal-body").html(`<div style='text-align: center;' class="bill-proof-container"><img width=${imgWidth} src=${billUrl} alt="Bill" /></div>`)
