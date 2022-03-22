@@ -239,10 +239,12 @@ describe('Given I am connected as Admin and I am on Dashboard page and I clicked
             window.localStorage.setItem('user', JSON.stringify({
                 type: 'Admin'
             }))
+
             document.body.innerHTML = DashboardFormUI(bills[0])
             const onNavigate = (pathname) => {
                 document.body.innerHTML = ROUTES({ pathname })
             }
+            console.log(window.location.hash)
             const store = null
             const dashboard = new Dashboard({
                 document,
@@ -273,7 +275,10 @@ describe("Given I am a user connected as Admin", () => {
             root.setAttribute("id", "root")
             document.body.append(root)
             router()
+                // console.log(window.location.hash)
             window.onNavigate(ROUTES_PATH.Dashboard)
+                // console.log(window.location.hash)
+
             await waitFor(() => screen.getByText("Validations"))
             const contentPending = await screen.getByText("En attente (1)")
             expect(contentPending).toBeTruthy()

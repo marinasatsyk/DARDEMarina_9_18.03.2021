@@ -11,7 +11,7 @@ export default class {
         if (buttonNewBill) buttonNewBill.addEventListener('click', this.handleClickNewBill)
         const iconEye = document.querySelectorAll(`div[data-testid="icon-eye"]`)
         if (iconEye) iconEye.forEach(icon => {
-            icon.addEventListener('click', () => this.handleClickIconEye(icon))
+            icon.addEventListener('click', (e) => this.handleClickIconEye(icon))
         })
         new Logout({ document, localStorage, onNavigate })
     }
@@ -38,13 +38,19 @@ export default class {
     }
 
     getBills = () => {
+        //env jest
+        // if (typeof jest !== 'undefined') {
+        //     this.store = jest.fn();
+        // }
         if (this.store) {
             return this.store
                 .bills()
                 .list()
                 .then(snapshot => {
+                    // console.log(snapshot);
                     const bills = snapshot
                         .map(doc => {
+                            // console.log(doc);
                             try {
                                 return {
                                     ...doc,

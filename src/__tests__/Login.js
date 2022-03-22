@@ -113,6 +113,42 @@ describe("Given that I am a user on login page", () => {
 
         test("It should renders Bills page", () => {
             document.body.innerHTML = LoginUI();
+            const inputData = {
+                email: "johndoe@email.com",
+                password: "azerty",
+            };
+            const form = screen.getByTestId("form-employee");
+
+            // localStorage should be populated with form data
+            Object.defineProperty(window, "localStorage", {
+                value: {
+                    getItem: jest.fn(() => null),
+                    setItem: jest.fn(() => null),
+                },
+                writable: true,
+            });
+
+            // we have to mock navigation to test it
+            const onNavigate = (pathname) => {
+                document.body.innerHTML = ROUTES({ pathname });
+            };
+
+            let PREVIOUS_LOCATION = "";
+
+            const store = jest.fn();
+
+            const login = new Login({
+                document,
+                localStorage: window.localStorage,
+                onNavigate,
+                PREVIOUS_LOCATION,
+                store,
+            });
+
+            const handleSubmit = jest.fn(login.handleSubmitEmployee);
+            login.login = jest.fn().mockResolvedValue({});
+            form.addEventListener("submit", handleSubmit);
+            fireEvent.submit(form);
 
             expect(screen.getAllByText("Mes notes de frais")).toBeTruthy();
         });
