@@ -4,7 +4,7 @@
 
 import LoginUI from "../views/LoginUI";
 import Login from "../containers/Login.js";
-import { ROUTES } from "../constants/routes";
+import { ROUTES, ROUTES_PATH } from "../constants/routes";
 import { fireEvent, screen } from "@testing-library/dom";
 
 describe("Given that I am a user on login page", () => {
@@ -52,8 +52,10 @@ describe("Given that I am a user on login page", () => {
         test("Then I should be identified as an Employee in app", () => {
             document.body.innerHTML = LoginUI();
             const inputData = {
+                // type: "Employee"
                 email: "johndoe@email.com",
                 password: "azerty",
+                // status: "connected"
             };
 
             const inputEmailUser = screen.getByTestId("employee-email-input");
@@ -83,9 +85,7 @@ describe("Given that I am a user on login page", () => {
             };
 
             let PREVIOUS_LOCATION = "";
-
             const store = jest.fn();
-
             const login = new Login({
                 document,
                 localStorage: window.localStorage,
@@ -109,14 +109,25 @@ describe("Given that I am a user on login page", () => {
                     status: "connected",
                 })
             );
+
+
         });
 
         test("It should renders Bills page", () => {
+            //on initialise login page
             document.body.innerHTML = LoginUI();
+            //variables pour se connecter 
             const inputData = {
                 email: "johndoe@email.com",
                 password: "azerty",
             };
+
+            //we  populate email, password
+            const inputEmailUser = screen.getByTestId("employee-email-input");
+            fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
+            const inputPasswordUser = screen.getByTestId("employee-password-input");
+            fireEvent.change(inputPasswordUser, { target: { value: inputData.password } });
+
             const form = screen.getByTestId("form-employee");
 
             // localStorage should be populated with form data
@@ -136,7 +147,9 @@ describe("Given that I am a user on login page", () => {
             let PREVIOUS_LOCATION = "";
 
             const store = jest.fn();
+            console.log(window.location.pathname);
 
+            // async function FuncAsync() {
             const login = new Login({
                 document,
                 localStorage: window.localStorage,
@@ -145,12 +158,43 @@ describe("Given that I am a user on login page", () => {
                 store,
             });
 
-            const handleSubmit = jest.fn(login.handleSubmitEmployee);
-            login.login = jest.fn().mockResolvedValue({});
-            form.addEventListener("submit", handleSubmit);
-            fireEvent.submit(form);
 
-            expect(screen.getAllByText("Mes notes de frais")).toBeTruthy();
+            login.login = jest.fn().mockImplementation(async() => {
+                await Promise.resolve({})
+                    .catch((err) => { login.createUser(user) })
+                    .then(() => {
+                        console.log("simulation1");
+                        onNavigate(ROUTES_PATH['Bills'])
+                        console.log("simulation2");
+                        PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+                            // PREVIOUS_LOCATION = PREVIOUS_LOCATION
+                        console.log("simulation3");
+                        // PREVIOUS_LOCATION = login.PREVIOUS_LOCATION
+                        console.log(window.location.pathname);
+
+                    })
+            })
+
+            const spyHandleSubmit = jest.spyOn(login, "handleSubmitEmployee")
+            const spyLogin = jest.spyOn(login, "login")
+            const spyOnNavigate = jest.spyOn(login, "onNavigate")
+
+
+            form.addEventListener("submit", login.handleSubmitEmployee);
+            fireEvent.submit(form);
+            expect(spyHandleSubmit).toHaveBeenCalled()
+            expect(spyLogin).toHaveBeenCalled()
+            expect(login.login).toHaveBeenCalledWith({
+                type: "Employee",
+                email: inputData.email,
+                password: inputData.password,
+                status: "connected"
+            })
+            expect(spyOnNavigate).toHaveBeenCalled()
+
+            console.log(window.location.pathname);
+
+            // expect(screen.getByText("Mes notes de frais")).toBeTruthy();
         });
     });
 });

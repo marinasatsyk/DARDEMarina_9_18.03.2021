@@ -29,8 +29,13 @@ export default class Login {
             )
             .then(() => {
                 this.onNavigate(ROUTES_PATH['Bills'])
+                console.log("1_");
                 this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
+                console.log("2_");
+
                 PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
+                console.log("3_");
+
                 this.document.body.style.backgroundColor = "#fff"
             })
 

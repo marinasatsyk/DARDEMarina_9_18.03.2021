@@ -5,17 +5,14 @@
 import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import userEvent from "@testing-library/user-event";
 import BillsUI, { row } from "../views/BillsUI.js";
-// import NewBillUI from "../views/NewBillUI.js";
 import { bills } from "../fixtures/bills.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import Bills from "../containers/Bills.js";
-// import store from "../app/Store.js";
 import router from "../app/Router.js";
 import mockStore from "../__mocks__/store";
 import { formatDate, formatStatus } from "../app/format.js";
 
-// jest.mock("../app/store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {
     describe("When I am on Bills Page", () => {
@@ -120,34 +117,58 @@ describe("Given I am connected as an employee", () => {
 describe('Given I am a user connected as Emplyee ', () => {
 
     describe("When I navigate to Bill page", () => {
-            // beforeEach(() => {
-            //     const bills_mocked = mockStore.bills()
-            //     jest.spyOn(bills, "list")
-            //     Object.defineProperty(
-            //         window,
-            //         'localStorage', { value: localStorageMock }
-            //     )
-            //     window.localStorage.setItem('user', JSON.stringify({
-            //         type: 'Employee',
-            //         email: "a@a"
-            //     }))
-            //     const root = document.createElement("div")
-            //     root.setAttribute("id", "root")
-            //     document.body.appendChild(root)
-            //     router()
-            //         // screen.debug()
-            // })
 
-            test("fetches bills from mock API GET ", async() => {
-                Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-                window.localStorage.setItem('user', JSON.stringify({
-                    type: 'Employee'
-                }))
+        test("fetches bills from mock API GET ", async() => {
+            Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+            window.localStorage.setItem('user', JSON.stringify({
+                type: 'Employee'
+            }))
 
-                const onNavigate = (pathname) => {
-                    document.body.innerHTML = ROUTES({ pathname })
-                }
+            const onNavigate = (pathname) => {
+                document.body.innerHTML = ROUTES({ pathname })
+            }
 
+
+            const bill = new Bills({
+                document,
+                onNavigate,
+                store: mockStore,
+                localStorage: window.localStorage
+            })
+
+
+            bill.getBills = jest.fn(async() => {
+                return mockStore
+                    .bills()
+                    .list()
+                    .then(snapshot => {
+                        const bills = snapshot
+                            .map(doc => {
+                                return {
+                                    ...doc,
+                                    date: formatDate(doc.date),
+                                    status: formatStatus(doc.status)
+                                };
+                            });
+                        return bills;
+                    })
+            })
+            const res_getBills = await bill.getBills()
+                // console.log(res_getBills);
+            const get_Bills_spy = jest.spyOn(bill, "getBills")
+            expect(get_Bills_spy).toHaveBeenCalled()
+        })
+
+        test("it should return an array with bills mocked changed ", () => {
+            Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+            window.localStorage.setItem('user', JSON.stringify({
+                type: 'Employee'
+            }))
+
+            const onNavigate = (pathname) => {
+                document.body.innerHTML = ROUTES({ pathname })
+            }
+            async function test_async() {
 
                 const bill = new Bills({
                     document,
@@ -156,133 +177,105 @@ describe('Given I am a user connected as Emplyee ', () => {
                     localStorage: window.localStorage
                 })
 
+                let bills1 = null;
+                await bill.getBills()
+                    .then(bills => { bills1 = bills; return mockStore.bills().list() })
+                    .then(bills2 => {
+                        // console.log(bills, bills2);
+                        const quelquechose = bills2
+                            .map(doc => {
+                                return {
+                                    ...doc,
+                                    date: formatDate(doc.date),
+                                    status: formatStatus(doc.status),
+                                }
 
-                bill.getBills = jest.fn(async() => {
-                    return mockStore
-                        .bills()
-                        .list()
-                        .then(snapshot => {
-                            const bills = snapshot
-                                .map(doc => {
-                                    return {
-                                        ...doc,
-                                        date: formatDate(doc.date),
-                                        status: formatStatus(doc.status)
-                                    };
-                                });
-                            return bills;
-                        })
-                })
-                const res_getBills = await bill.getBills()
-                    // console.log(res_getBills);
-                const get_Bills_spy = jest.spyOn(bill, "getBills")
-                expect(get_Bills_spy).toHaveBeenCalled()
-            })
+                            })
+                            // console.log(bills1, quelquechose);
+                        expect(bills1).toEqual(quelquechose)
+                    });
+
+            }
+
+            test_async(mockStore);
+
+        })
+    })
 
 
-            test("it should return an array with bills mocked changed ", () => {
-                Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-                window.localStorage.setItem('user', JSON.stringify({
-                    type: 'Employee'
-                }))
+    describe("When an error occurs on API", () => {
 
-                const onNavigate = (pathname) => {
-                    document.body.innerHTML = ROUTES({ pathname })
+        test("it should return an error 500", () => {
+
+            Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+            window.localStorage.setItem('user', JSON.stringify({
+                type: 'Employee'
+            }))
+
+            const onNavigate = (pathname) => {
+                document.body.innerHTML = ROUTES({ pathname })
+            }
+
+            async function test_async() {
+
+                const mockStore1 = {
+                    bills: () => {
+                        return {
+                            list: () => {
+                                return Promise.resolve([{ "id": "shiohsioph" }])
+                            }
+                        }
+                    }
+                }
+
+                const mockStore2 = {
+                    bills: () => {
+                        return {
+                            list: () => {
+                                return Promise.resolve([{ "id": "shiohsioph", date: undefined, status: undefined }])
+                            }
+                        }
+                    }
                 }
 
                 const bill = new Bills({
                     document,
                     onNavigate,
-                    mockStore,
+                    store: mockStore1,
                     localStorage: window.localStorage
                 })
 
-                let storeFn = jest.fn(() => this.store = mockStore)
-                storeFn()
-                const res = bill.getBills()
-                console.log(res);
-                // bill.getBills = jest.fn(() => {
-                //         return mockStore
-                //             .bills()
-                //             .list()
+                await bill.getBills()
+                    .then(bills1 => {
+                        mockStore2.bills().list()
+                            .then(bills2 => {
+                                expect(bills1).toEqual(bills2)
+                            })
+                    });
 
-                //     })
-                //     .then(snapshot => {
-                //         const result = snapshot;
-                //         try {
-                //             return result
-                //         } catch (e) {
-                //             console.log(e);
-                //         }
-                //         // return result
-                //     });
+            }
 
-
-                // console.log(bill.getBills());
-                function mock_res() {
-                    const test_mock = async function mock_fn() {
-                        const res = await mockStore.bills().list()
-                        return res
-                    }
-                    test_mock()
-                        .then(test => {
-                            console.log(test);
-
-                        });
-
-                }
-
-
-
-
-                // return bill.getBills()
-
-
-                //     console.log(snapshot);
-                //     expect(snapshot).toEqual(mock_Store)
-                //     const bills = snapshot.map(doc => {
-
-                //         return {
-                //             ...doc,
-                //             date: formatDate(doc.date),
-                //             status: formatStatus(doc.status),
-                //         }
-                //     })
-                // })
-
-
-
-            })
-
+            test_async();
 
         })
-        // test.todo("fetches bills from mock API GET contains a status", async() => {
 
-
-
-
-
-
-    describe("When an error occurs on API", () => {
-        beforeEach(() => {
-            const bills = mockStore.bills()
-            jest.spyOn(bills, "list")
-            Object.defineProperty(
-                window,
-                'localStorage', { value: localStorageMock }
-            )
+        test("fetches bills from an API and fails with 404 message error", () => {
+            Object.defineProperty(window, 'localStorage', { value: localStorageMock })
             window.localStorage.setItem('user', JSON.stringify({
-                type: 'Employee',
-                email: "a@a"
+                type: 'Employee'
             }))
-            const root = document.createElement("div")
-            root.setAttribute("id", "root")
-            document.body.appendChild(root)
-            router()
-        })
 
-        test.todo("fetches bills from an API and fails with 404 message error")
-            // test("fetches bills from an API and fails with 404 message error", async() => {
+            const onNavigate = (pathname) => {
+                document.body.innerHTML = ROUTES({ pathname })
+            }
+
+            const bill = new Bills({
+                document,
+                onNavigate,
+                store: mockStore,
+                localStorage: window.localStorage
+            })
+        })
         const bills = mockStore.bills()
             //     bills.mockImplementationOnce(() => {
             //         return {
@@ -297,20 +290,7 @@ describe('Given I am a user connected as Emplyee ', () => {
             //     expect(message).toBeTruthy()
             // })
 
-        test.todo("fetches bills from an API and fails with 500 message error")
-            // test.todo("fetches bills from an API and fails with 500 message error", async() => {
-            //     mockStore.bills.mockImplementationOnce(() => {
-            //         return {
-            //             list: () => {
-            //                 return Promise.reject(new Error("Erreur 500"))
-            //             }
-            //         }
-            //     })
-            //     window.onNavigate(ROUTES_PATH.Bills)
-            //     await new Promise(process.nextTick);
-            //     const message = await screen.getByText(/Erreur 500/)
-            //     expect(message).toBeTruthy()
-            // })
+
 
 
 
