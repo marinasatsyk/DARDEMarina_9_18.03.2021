@@ -6,6 +6,8 @@ import LoginUI from "../views/LoginUI";
 import Login from "../containers/Login.js";
 import { ROUTES, ROUTES_PATH } from "../constants/routes";
 import { fireEvent, screen } from "@testing-library/dom";
+import { Store } from "../app/Store"
+import BillsUI from "../views/BillsUI"
 
 describe("Given that I am a user on login page", () => {
     describe("When I do not fill fields and I click on employee button Login In", () => {
@@ -82,6 +84,7 @@ describe("Given that I am a user on login page", () => {
             // we have to mock navigation to test it
             const onNavigate = (pathname) => {
                 document.body.innerHTML = ROUTES({ pathname });
+
             };
 
             let PREVIOUS_LOCATION = "";
@@ -100,6 +103,7 @@ describe("Given that I am a user on login page", () => {
             fireEvent.submit(form);
             expect(handleSubmit).toHaveBeenCalled();
             expect(window.localStorage.setItem).toHaveBeenCalled();
+
             expect(window.localStorage.setItem).toHaveBeenCalledWith(
                 "user",
                 JSON.stringify({
@@ -112,22 +116,20 @@ describe("Given that I am a user on login page", () => {
 
 
         });
-
-        test("It should renders Bills page", () => {
+        //test POST metode ?
+        test("It should renders Bills page", async() => {
             //on initialise login page
             document.body.innerHTML = LoginUI();
             //variables pour se connecter 
             const inputData = {
-                email: "johndoe@email.com",
-                password: "azerty",
+                email: "employee@test.tld",
+                password: "employee",
             };
-
             //we  populate email, password
             const inputEmailUser = screen.getByTestId("employee-email-input");
             fireEvent.change(inputEmailUser, { target: { value: inputData.email } });
             const inputPasswordUser = screen.getByTestId("employee-password-input");
             fireEvent.change(inputPasswordUser, { target: { value: inputData.password } });
-
             const form = screen.getByTestId("form-employee");
 
             // localStorage should be populated with form data
@@ -139,17 +141,13 @@ describe("Given that I am a user on login page", () => {
                 writable: true,
             });
 
-            // we have to mock navigation to test it
+            // we have to mock navigation to test it. data is for BillsUI
             const onNavigate = (pathname) => {
-                document.body.innerHTML = ROUTES({ pathname });
+                document.body.innerHTML = ROUTES({ pathname, data: [] });
             };
 
             let PREVIOUS_LOCATION = "";
-
             const store = jest.fn();
-            console.log(window.location.pathname);
-
-            // async function FuncAsync() {
             const login = new Login({
                 document,
                 localStorage: window.localStorage,
@@ -157,44 +155,33 @@ describe("Given that I am a user on login page", () => {
                 PREVIOUS_LOCATION,
                 store,
             });
-
-
-            login.login = jest.fn().mockImplementation(async() => {
+            console.log(9);
+            const handleSubmit = jest.fn(login.handleSubmitEmployee);
+            login.createUser = jest.fn()
+            login.login = jest.fn(async() => {
                 await Promise.resolve({})
-                    .catch((err) => { login.createUser(user) })
-                    .then(() => {
-                        console.log("simulation1");
+                    .catch(
+                        (err) => login.createUser(user)
+                    )
+                    .then((res) => {
+                        console.log("function page test");
                         onNavigate(ROUTES_PATH['Bills'])
-                        console.log("simulation2");
                         PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-                            // PREVIOUS_LOCATION = PREVIOUS_LOCATION
-                        console.log("simulation3");
-                        // PREVIOUS_LOCATION = login.PREVIOUS_LOCATION
-                        console.log(window.location.pathname);
-
                     })
             })
 
-            const spyHandleSubmit = jest.spyOn(login, "handleSubmitEmployee")
-            const spyLogin = jest.spyOn(login, "login")
-            const spyOnNavigate = jest.spyOn(login, "onNavigate")
-
-
-            form.addEventListener("submit", login.handleSubmitEmployee);
+            form.addEventListener("submit", handleSubmit);
             fireEvent.submit(form);
-            expect(spyHandleSubmit).toHaveBeenCalled()
-            expect(spyLogin).toHaveBeenCalled()
+            await login.login()
+            expect(handleSubmit).toHaveBeenCalled();
+            expect(login.login).toHaveBeenCalled();
             expect(login.login).toHaveBeenCalledWith({
                 type: "Employee",
                 email: inputData.email,
                 password: inputData.password,
                 status: "connected"
             })
-            expect(spyOnNavigate).toHaveBeenCalled()
-
-            console.log(window.location.pathname);
-
-            // expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+            expect(screen.getByText("Mes notes de frais")).toBeTruthy();
         });
     });
 });

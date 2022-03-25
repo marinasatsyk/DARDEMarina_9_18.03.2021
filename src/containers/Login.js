@@ -28,10 +28,11 @@ export default class Login {
                 (err) => this.createUser(user)
             )
             .then(() => {
+                console.log("function page principale");
                 this.onNavigate(ROUTES_PATH['Bills'])
-                console.log("1_");
+                    // console.log("1_");
                 this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
-                console.log("2_");
+                    // console.log(this.PREVIOUS_LOCATION);
 
                 PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
                 console.log("3_");
@@ -52,9 +53,13 @@ export default class Login {
         this.localStorage.setItem("user", JSON.stringify(user))
         this.login(user)
             .catch(
-                (err) => this.createUser(user)
+                (err) => {
+                    console.log(err);
+                    this.createUser(user)
+                }
             )
             .then(() => {
+                // console.log("admin");
                 this.onNavigate(ROUTES_PATH['Dashboard'])
                 this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
                 PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
@@ -62,6 +67,7 @@ export default class Login {
             })
     }
 
+    /* istanbul ignore next */
     // not need to cover this function by tests
     login = (user) => {
         if (this.store) {
@@ -77,6 +83,7 @@ export default class Login {
         }
     }
 
+    /* istanbul ignore next */
     // not need to cover this function by tests
     createUser = (user) => {
         if (this.store) {
