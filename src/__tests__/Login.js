@@ -155,7 +155,7 @@ describe("Given that I am a user on login page", () => {
                 PREVIOUS_LOCATION,
                 store,
             });
-            console.log(9);
+            // console.log(9);
             const handleSubmit = jest.fn(login.handleSubmitEmployee);
             login.createUser = jest.fn()
             login.login = jest.fn(async() => {

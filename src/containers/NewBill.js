@@ -14,22 +14,29 @@ export default class NewBill {
         this.fileName = null
         this.billId = null
         new Logout({ document, localStorage, onNavigate })
+
+
+
+
     }
 
     handleChangeFile = e => {
         e.preventDefault()
             // if (e.target.files[0].type == "application/jpg" || e.target.files[0].type == "application/jpeg" || e.target.files[0].type == "application/png") {
-        console.log(e.target.files[0].type)
+            // console.log("handleChange_MAIN")
+            // console.log(e)
+            // console.log(e.target.files[0])
         if (e.target.files[0].type != "image/jpg" && e.target.files[0].type != "image/jpeg" && e.target.files[0].type != "image/png") {
             console.log(false)
             return
 
         }
         const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
+            // console.log(file);
         const filePath = e.target.value.split(/\\/g)
-        console.log(filePath);
+            // console.log(filePath);
         const fileName = filePath[filePath.length - 1]
-        console.log(fileName);
+            // console.log(fileName);
         const formData = new FormData()
         const email = JSON.parse(localStorage.getItem("user")).email
         formData.append('file', file)
@@ -47,9 +54,12 @@ export default class NewBill {
                 }
             })
             .then(({ fileUrl, key }) => {
-                console.log(fileUrl)
+                console.log("store create working");
+
                 this.billId = key
+                console.log(key);
                 this.fileUrl = fileUrl
+                console.log(fileUrl);
                 this.fileName = fileName
             }).catch(error => console.error(error))
             // } else {
