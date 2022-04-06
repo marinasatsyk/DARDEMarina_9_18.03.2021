@@ -29,7 +29,7 @@ describe("Given I am connected as an employee", () => {
             window.onNavigate(ROUTES_PATH.Bills)
             await waitFor(() => screen.getByTestId('icon-window'))
             const windowIcon = screen.getByTestId('icon-window')
-                //to-do write expect expression ... waitFor().toBeEqual(widowIcon)
+
             expect(windowIcon.classList.contains("active-icon")).toBeTruthy();
 
         })
@@ -42,7 +42,7 @@ describe("Given I am connected as an employee", () => {
             })
             //====================
 
-        it("should open a modal page when I click on the icon eye", () => {
+        test("It should open a modal page when I click on the icon eye", () => {
             Object.defineProperty(window, 'localStorage', { value: localStorageMock })
             window.localStorage.setItem('user', JSON.stringify({
                 type: 'Employee'
@@ -66,11 +66,9 @@ describe("Given I am connected as an employee", () => {
             const handleClickIconEye_test = jest.fn(() => bill.handleClickIconEye(icons[0]))
 
             icons.forEach((icon) => {
-                    icon.addEventListener('click', handleClickIconEye_test(icon))
-                })
-                // icons.forEach((icon) => {
-                //     userEvent.click(icon)
-                // })
+                icon.addEventListener('click', handleClickIconEye_test(icon))
+            })
+
             handleClickIconEye_test(icons[0])
             expect(handleClickIconEye_test).toHaveBeenCalled()
 
