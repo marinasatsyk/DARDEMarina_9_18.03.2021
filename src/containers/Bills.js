@@ -13,6 +13,7 @@ export default class {
         if (iconEye) iconEye.forEach(icon => {
             icon.addEventListener('click', (e) => this.handleClickIconEye(icon))
         })
+        this.v = 12;
         new Logout({ document, localStorage, onNavigate })
     }
 
@@ -50,6 +51,9 @@ export default class {
                     console.log(snapshot);
                     const bills = snapshot
                         .map(doc => {
+                            if (this.vv == 12) {
+                                console.log("salut");
+                            }
                             // console.log(doc);
                             try {
                                 return {

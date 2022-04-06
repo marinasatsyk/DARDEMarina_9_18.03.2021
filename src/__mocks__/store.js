@@ -66,6 +66,7 @@
      create(bill) {
          return Promise.resolve({
              fileUrl: 'https://localhost:3456/images/bill-abcde.jpg',
+             fileName: 'bill-abcde.jpg',
              key: '1234',
          })
      },

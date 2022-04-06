@@ -18,53 +18,56 @@ import mockStore, { mockedBills } from "../__mocks__/store"
 import { header } from "express/lib/response"
 import store from "../app/Store"
 
-describe("Given I am connected as an employee", () => {
-    describe("When I am on NewBill Page", () => {
+describe("Given I am connected as an employee on NewBill Page", () => {
 
+    beforeAll(() => {
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({
+            type: 'Employee',
+            email: 'johndoe@email.com',
+        }))
+    })
+
+    afterAll(() => {
+        window.localStorage.clear();
+    })
+
+    var onNavigate;
+
+    beforeEach(() => {
+        document.body.innerHTML = NewBillUI();
+
+        // we have to mock navigation to test it. data is for BillsUI
+        onNavigate = (pathname) => {
+            document.body.innerHTML = ROUTES({ pathname, data: [] });
+        };
 
     })
 
-    describe("When I am on the NewBill page and I click choose file", () => {
+
+    describe("then when I click 'choose file'", () => {
+
+        var newBill;
+
+        //variables pour créer un newBill 
+        const inputData = {
+            file: "bill-abcde.jpg",
+        };
+        var handleChangeFile;
 
         beforeEach(() => {
-            const html = NewBillUI();
-            document.body.innerHTML = html;
-        })
-
-        test("It should attach a file after func handleChangeFile", () => {
-            //variables pour créer un newBill 
-            const inputData = {
-                file: "Bill_test.jpg",
-            };
-
-            // Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-            const user = JSON.stringify({
-                type: 'Employee'
-            })
-
-            Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-            window.localStorage.setItem('user', JSON.stringify({
-                    type: 'Employee',
-                    email: 'johndoe@email.com',
-                }))
-                // we have to mock navigation to test it. data is for BillsUI
-            const onNavigate = (pathname) => {
-                document.body.innerHTML = ROUTES({ pathname, data: [] });
-            };
-
-            const newBill = new NewBill({
+            newBill = new NewBill({
                 document,
                 onNavigate,
                 store: mockStore,
                 localStorage: window.localStorage,
             });
-            newBill.updateBill = jest.fn();
 
-            const handleChangeFile = jest.fn(() => newBill.handleChangeFile);
+            handleChangeFile = jest.spyOn(newBill, "handleChangeFile");
             const Inputfile = screen.getByTestId("file");
             expect(Inputfile).toBeTruthy()
 
-            Inputfile.addEventListener("change", handleChangeFile)
+            Inputfile.addEventListener("change", newBill.handleChangeFile)
 
             fireEvent.change(Inputfile, {
                 target: {
@@ -76,13 +79,66 @@ describe("Given I am connected as an employee", () => {
                     ]
                 }
             });
-            // await newBill.store()
-            expect(handleChangeFile).toHaveBeenCalled();
-            expect(Inputfile.files[0].name).toEqual(inputData.file);
-            expect(newBill.handledFile).not.toBeNull();
-
         })
 
+        test("It should attach a file to the filerequester", () => {
+            // step 1 : function called
+            expect(handleChangeFile).toHaveBeenCalled();
+        })
+
+        test("when a file is changed then newBill contains file data", () => {
+            expect(newBill.fileName).toEqual(inputData.file);
+        })
+
+        test("", () => {
+
+            const inputData = {
+                vat: "20",
+                type: "Hôtel et logement",
+                commentary: "",
+                name: "AAAZZZaaazz0.123456789",
+                date: "2021-11-22",
+                amount: "120",
+                pct: "20"
+            };
+
+            //variables pour créer un newBill 
+            const form = screen.getByTestId("form-new-bill");
+            expect(form).toBeTruthy()
+
+            const type = screen.getByTestId("expense-type");
+            const name = screen.getByTestId("expense-name");
+            const date = screen.getByTestId("datepicker");
+            const amount = screen.getByTestId("amount");
+            const vat = screen.getByTestId("vat");
+            const pct = screen.getByTestId("pct");
+            const commentary = screen.getByTestId("commentary");
+
+            fireEvent.change(type, { target: { value: inputData.type } });
+            fireEvent.change(name, { target: { value: inputData.name } });
+            fireEvent.change(date, { target: { value: inputData.date } });
+            fireEvent.change(amount, { target: { value: inputData.amount } });
+            fireEvent.change(vat, { target: { value: inputData.vat } });
+            fireEvent.change(pct, { target: { value: inputData.pct } });
+            fireEvent.change(commentary, { target: { value: inputData.commentary } });
+
+            const SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit");
+            form.addEventListener("submit", newBill.handleSubmit)
+
+            fireEvent.submit(form)
+
+            expect(SpyHandleSubmit).toHaveBeenCalled()
+
+            expect(screen.getByText("Mes notes de frais")).toBeTruthy()
+            screen.debug();
+
+        })
+    })
+
+    // describe("", () => {})
+})
+
+/*
         test("it should display null when I attach a file that is not jpg,jpeg,png", () => {
             //variables pour créer un newBill 
             const inputData = {
@@ -142,7 +198,7 @@ describe("Given I am connected as an employee", () => {
 
 })
 describe("when I click submit", () => {
-    test("It  should calle handleSubmit function and show bill page", () => {
+    test("It  should calle handleSubmit function and show bill page", async() => {
         //on initialise newBill page
         const html = NewBillUI();
         document.body.innerHTML = html;
@@ -165,24 +221,48 @@ describe("when I click submit", () => {
         };
 
         const newBill = new NewBill({
-            document,
-            onNavigate,
-            store: null,
-            localStorage: window.localStorage,
-        })
+                document,
+                onNavigate,
+                store: mockStore,
+                localStorage: window.localStorage,
+            })
+            
+            const file = new File(
+                ["image"],
+                inputData.fileName, { type: 'image/jpg' }
+            )
 
-        const SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit")
-        newBill.handleSubmit = jest.fn(() => {
-            onNavigate(ROUTES_PATH['Bills'])
-        })
-        const form = screen.getByTestId("form-new-bill");
-        expect(form).toBeTruthy()
-        form.addEventListener("submit", newBill.handleSubmit)
-        fireEvent.submit(form)
-        expect(newBill.handleSubmit).toHaveBeenCalled()
-            // screen.debug()
-        expect(screen.getByText("Mes notes de frais")).toBeTruthy()
+            const formData = new FormData();
+            const email = JSON.parse(localStorage.getItem("user")).email;
+            formData.append('file', file);
+            formData.append('email', email);
 
+            newBill._handleFile = {
+                data: formData,
+                fileName: inputData.fileName
+            }
+        
+
+
+
+
+
+
+
+
+            const SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit");
+            // newBill.handleSubmit = jest.fn(() => {
+            //     onNavigate(ROUTES_PATH['Bills'])
+            // })
+
+            const form = screen.getByTestId("form-new-bill");
+            expect(form).toBeTruthy()
+            form.addEventListener("submit", newBill.handleSubmit)
+            fireEvent.submit(form)
+            expect(SpyHandleSubmit).toHaveBeenCalled()
+                // screen.debug()
+            expect(screen.getByText("Mes notes de frais")).toBeTruthy()
+            
     })
 
 
@@ -237,6 +317,10 @@ describe("when I click submit", () => {
         })
 
 
+
+
+
+
         const inputData = {
             vat: "20",
             type: "Hôtel et logement",
@@ -273,27 +357,27 @@ describe("when I click submit", () => {
                 return;
             }
 
-            // return console.log(store
-            //     .bills()
-            //     .create({
-            //         data: _handleFile.data,
-            //         headers: { noContentType: true }
-            //     }));
-            store
+            return console.log(store
                 .bills()
                 .create({
                     data: _handleFile.data,
                     headers: { noContentType: true }
-                })
-                .then(res => {
-                    console.log(res)
-                })
-            console.log("2")
+                }));
+            // store
+            //     .bills()
+            //     .create({
+            //         data: _handleFile.data,
+            //         headers: { noContentType: true }
+            //     })
+            //     .then(res => {
+            //         console.log(res)
+            //     })
+            // console.log("2")
 
 
         })
 
-        const spyMockstore = jest.spyOn(newBill, "create");
+        // const spyMockstore = jest.spyOn(newBill, "create");
 
 
         const SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit");
@@ -385,3 +469,4 @@ describe("when I click submit", () => {
 //     // })
 
 // })
+*/
