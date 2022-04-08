@@ -39,10 +39,7 @@ export default class {
     }
 
     getBills = () => {
-        //env jest
-        // if (typeof jest !== 'undefined') {
-        //     this.store = jest.fn();
-        // }
+
         if (this.store) {
             return this.store
                 .bills()

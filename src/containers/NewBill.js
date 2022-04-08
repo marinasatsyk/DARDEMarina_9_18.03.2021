@@ -6,7 +6,7 @@ export default class NewBill {
         this.document = document
         this.onNavigate = onNavigate
         this.store = store
-        console.log(store);
+            // console.log(store);
         const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`)
         formNewBill.addEventListener("submit", this.handleSubmit)
         const file = this.document.querySelector(`input[data-testid="file"]`)
@@ -25,23 +25,24 @@ export default class NewBill {
 
     handleChangeFile = async(e) => {
         e.preventDefault()
-        console.log(e.target.value);
+            // console.log(e.target.value);
         const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-        console.log(file);
-        //const filePath = e.target.value.split(/\\/g)
+            // console.log(file);
+            //const filePath = e.target.value.split(/\\/g)
         const fileName = file.name; //filePath[filePath.length - 1]
         const formData = new FormData()
         const email = JSON.parse(localStorage.getItem("user")).email
         formData.append('file', file)
         formData.append('email', email)
         this.fileName = "Autre chose";
-        console.log("---->>>");
-        console.log(fileName);
+        // console.log("---->>>");
+        // console.log(fileName);
 
         const ext = fileName.split `.`;
         if (ext.length < 1 || (ext[ext.length - 1] !== "jpg" && ext[ext.length - 1] !== "jpeg" && ext[ext.length - 1] !== "png")) {
             this.document.querySelector("#id-file-error").textContent = "erreur de format";
             this.document.querySelector("#id-file-error").style.display = "block"
+            return false;
         } else {
             this.document.querySelector("#id-file-error").textContent = "";
             this.document.querySelector("#id-file-error").style.display = "none"
@@ -56,7 +57,7 @@ export default class NewBill {
                 }
             })
             .then(({ fileName, fileUrl, key }) => {
-                console.log(fileName)
+                // console.log(fileName)
                 this.billId = key
                 this.fileUrl = fileUrl
                 this.fileName = fileName

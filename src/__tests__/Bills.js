@@ -42,6 +42,7 @@ describe("Given I am connected as an employee", () => {
             })
             //====================
 
+
         test("It should open a modal page when I click on the icon eye", () => {
             Object.defineProperty(window, 'localStorage', { value: localStorageMock })
             window.localStorage.setItem('user', JSON.stringify({
@@ -256,42 +257,6 @@ describe('Given I am a user connected as Emplyee ', () => {
             test_async();
 
         })
-
-        test("fetches bills from an API and fails with 404 message error", () => {
-            Object.defineProperty(window, 'localStorage', { value: localStorageMock })
-            window.localStorage.setItem('user', JSON.stringify({
-                type: 'Employee'
-            }))
-
-            const onNavigate = (pathname) => {
-                document.body.innerHTML = ROUTES({ pathname })
-            }
-
-            const bill = new Bills({
-                document,
-                onNavigate,
-                store: mockStore,
-                localStorage: window.localStorage
-            })
-        })
-        const bills = mockStore.bills()
-            //     bills.mockImplementationOnce(() => {
-            //         return {
-            //             list: () => {
-            //                 return Promise.reject(new Error("Erreur 404"))
-            //             }
-            //         }
-            //     })
-            //     window.onNavigate(ROUTES_PATH.Bills)
-            //     await new Promise(process.nextTick);
-            //     const message = await screen.getByText(/Erreur 404/)
-            //     expect(message).toBeTruthy()
-            // })
-
-
-
-
-
     })
 
 })
