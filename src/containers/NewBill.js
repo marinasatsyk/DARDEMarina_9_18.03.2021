@@ -14,20 +14,13 @@ export default class NewBill {
         this.fileUrl = null
         this.fileName = null
         this.billId = null
-            //this._handleFile = null
         new Logout({ document, localStorage, onNavigate })
-
-    }
-
-    get handledFile() {
-        return this._handleFile;
     }
 
     handleChangeFile = async(e) => {
         e.preventDefault()
             // console.log(e.target.value);
         const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-            // console.log(file);
             //const filePath = e.target.value.split(/\\/g)
         const fileName = file.name; //filePath[filePath.length - 1]
         const formData = new FormData()
@@ -38,10 +31,12 @@ export default class NewBill {
         // console.log("---->>>");
         // console.log(fileName);
 
+        //for display an error when a file  extenction not allowed
         const ext = fileName.split `.`;
         if (ext.length < 1 || (ext[ext.length - 1] !== "jpg" && ext[ext.length - 1] !== "jpeg" && ext[ext.length - 1] !== "png")) {
             this.document.querySelector("#id-file-error").textContent = "erreur de format";
             this.document.querySelector("#id-file-error").style.display = "block"
+            this.document.querySelector(`input[data-testid="file"]`).value = '';
             return false;
         } else {
             this.document.querySelector("#id-file-error").textContent = "";

@@ -57,6 +57,7 @@ export const cards = (bills) => {
 }
 
 export const getStatus = (index) => {
+
     switch (index) {
         case 1:
             return "pending"

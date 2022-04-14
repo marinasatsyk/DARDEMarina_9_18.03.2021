@@ -40,7 +40,7 @@ describe("Given I am connected as an employee on NewBill Page", () => {
 
         var newBill;
 
-        //variables pour créer un newBill 
+        //variables for create one newBill 
         const inputData = {
             file: "bill-abcde.jpg",
         };

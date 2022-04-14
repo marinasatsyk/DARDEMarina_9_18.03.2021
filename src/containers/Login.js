@@ -30,19 +30,18 @@ export default class Login {
             .then(() => {
                 console.log("function page principale");
                 this.onNavigate(ROUTES_PATH['Bills'])
-                    // console.log("1_");
                 this.PREVIOUS_LOCATION = ROUTES_PATH['Bills']
                     // console.log(this.PREVIOUS_LOCATION);
 
                 PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
-                console.log("3_");
+
 
                 this.document.body.style.backgroundColor = "#fff"
             })
 
     }
 
-    handleSubmitAdmin = e => {
+    handleSubmitAdmin = (e) => {
         e.preventDefault()
         const user = {
             type: "Admin",
@@ -59,7 +58,6 @@ export default class Login {
                 }
             )
             .then(() => {
-                // console.log("admin");
                 this.onNavigate(ROUTES_PATH['Dashboard'])
                 this.PREVIOUS_LOCATION = ROUTES_PATH['Dashboard']
                 PREVIOUS_LOCATION = this.PREVIOUS_LOCATION
