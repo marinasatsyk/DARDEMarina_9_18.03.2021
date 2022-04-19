@@ -54,14 +54,15 @@ describe("Given I am connected as an employee", () => {
             //we have to mock localStorage
             Object.defineProperty(window, 'localStorage', { value: localStorageMock })
             window.localStorage.setItem('user', JSON.stringify({
-                    type: 'Employee'
-                }))
-                //we have to mock navifation
+                type: 'Employee'
+            }))
 
+            //we have to mock navifation
             onNavigate = (pathname) => {
                 document.body.innerHTML = ROUTES({ pathname, data: [] })
             }
 
+            //we have to declarate an instance of Bills for populate the screen
             bill = new Bills({
                 document,
                 onNavigate,
@@ -157,7 +158,7 @@ describe("Given I am connected as an employee", () => {
             const icons = screen.getAllByTestId('icon-eye')
             expect(icons).toBeTruthy
 
-            //we have to mock the function being checking with one element for check
+            //we have get an element for check
             let icon_test = icons[0];
 
             // we spy the function being checking
@@ -165,10 +166,12 @@ describe("Given I am connected as an employee", () => {
 
 
             icon_test.addEventListener('click', bill.handleClickIconEye(icon_test))
-                //we emulate user event
+
+            //we emulate user event
             userEvent.click(icon_test)
             expect(handleClickIconEye_test).toHaveBeenCalled()
             expect(handleClickIconEye_test).toBeCalledWith(icon_test);
+
             let modal = screen.getByTestId("modaleFileEmployee")
             expect(modal).toBeTruthy()
         })
@@ -180,19 +183,13 @@ describe("Given I am connected as an employee", () => {
             const buttonNewBill = screen.getByTestId("btn-new-bill");
             expect(buttonNewBill).toBeTruthy();
 
-            //we have to spy the function being checking 
-            // const handleClickNewBill_spy = jest.spyOn(bill, "handleClickNewBill");
-
             buttonNewBill.addEventListener("click", bill.handleClickNewBill);
             userEvent.click(buttonNewBill)
-                // expect(handleClickNewBill_spy).toHaveBeenCalled()
 
             expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
-
         })
 
     })
-
 
 })
 
@@ -234,7 +231,7 @@ describe("Given I am connected as an employee", () => {
         })
 
         test("it should return an error 500", async() => {
-
+            //we have to mock an promisse reject
             const mockStoreFail = {
                 bills: () => {
                     return {
@@ -257,6 +254,8 @@ describe("Given I am connected as an employee", () => {
                 expect(false).toBeTruthy();
             } catch (err) {
                 expect(true).toBeTruthy();
+                expect(false).not.toBeTruthy();
+
             }
         })
     })

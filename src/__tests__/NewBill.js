@@ -8,9 +8,13 @@ import NewBill from "../containers/NewBill.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import mockStore, { mockedBills } from "../__mocks__/store"
+import router from "../app/Router"
+import store from "../__mocks__/store";
+
 
 describe("Given I am connected as an employee on NewBill Page", () => {
-
+    /**we prepare the environement for all tests */
+    //we have to mock localStorage before all tests
     beforeAll(() => {
         Object.defineProperty(window, 'localStorage', { value: localStorageMock })
         window.localStorage.setItem('user', JSON.stringify({
@@ -20,21 +24,22 @@ describe("Given I am connected as an employee on NewBill Page", () => {
     })
 
     afterAll(() => {
-        window.localStorage.clear();
-    })
-
+            window.localStorage.clear();
+        })
+        //we declare an variable for navigation
     var onNavigate;
 
     beforeEach(() => {
         document.body.innerHTML = NewBillUI();
 
-        // we have to mock navigation to test it. data is for BillsUI
+        /* we have to mock navigation to test it. 
+        data is for BillsUI*/
+
         onNavigate = (pathname) => {
             document.body.innerHTML = ROUTES({ pathname, data: [] });
         };
 
     })
-
 
     describe("then when I click 'choose file'", () => {
 
@@ -53,10 +58,10 @@ describe("Given I am connected as an employee on NewBill Page", () => {
                 store: mockStore,
                 localStorage: window.localStorage,
             });
-
+            //we have to spy the function being check
             handleChangeFile = jest.spyOn(newBill, "handleChangeFile");
             const Inputfile = screen.getByTestId("file");
-            expect(Inputfile).toBeTruthy()
+            // expect(Inputfile).toBeTruthy()
 
             Inputfile.addEventListener("change", newBill.handleChangeFile)
 
@@ -81,6 +86,8 @@ describe("Given I am connected as an employee on NewBill Page", () => {
             expect(newBill.fileName).toEqual(inputData.file);
         })
 
+
+
         test("when I  click submit newBill form It displays bill page", () => {
 
             const inputData = {
@@ -104,7 +111,7 @@ describe("Given I am connected as an employee on NewBill Page", () => {
             const vat = screen.getByTestId("vat");
             const pct = screen.getByTestId("pct");
             const commentary = screen.getByTestId("commentary");
-
+            //we do a simulation of the input actions of user in order to populate the fields required
             fireEvent.change(type, { target: { value: inputData.type } });
             fireEvent.change(name, { target: { value: inputData.name } });
             fireEvent.change(date, { target: { value: inputData.date } });
@@ -113,16 +120,17 @@ describe("Given I am connected as an employee on NewBill Page", () => {
             fireEvent.change(pct, { target: { value: inputData.pct } });
             fireEvent.change(commentary, { target: { value: inputData.commentary } });
 
+            //we have to spy the fucntion being check
             const SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit");
-            form.addEventListener("submit", newBill.handleSubmit)
+            form.addEventListener("submit", newBill.handleSubmit);
+            fireEvent.submit(form);
 
-            fireEvent.submit(form)
-
-            expect(SpyHandleSubmit).toHaveBeenCalled()
-
-            expect(screen.getByText("Mes notes de frais")).toBeTruthy()
-                // screen.debug();
+            expect(SpyHandleSubmit).toHaveBeenCalled();
+            //we check if the page of bills opened
+            expect(screen.getByText("Mes notes de frais")).toBeTruthy();
 
         })
+
     })
+
 })

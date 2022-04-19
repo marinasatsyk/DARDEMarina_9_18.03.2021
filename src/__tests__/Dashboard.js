@@ -275,9 +275,7 @@ describe("Given I am a user connected as Admin", () => {
             root.setAttribute("id", "root")
             document.body.append(root)
             router()
-                // console.log(window.location.hash)
             window.onNavigate(ROUTES_PATH.Dashboard)
-                // console.log(window.location.hash)
 
             await waitFor(() => screen.getByText("Validations"))
             const contentPending = await screen.getByText("En attente (1)")

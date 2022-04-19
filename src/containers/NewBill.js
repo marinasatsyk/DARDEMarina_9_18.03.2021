@@ -6,7 +6,6 @@ export default class NewBill {
         this.document = document
         this.onNavigate = onNavigate
         this.store = store
-            // console.log(store);
         const formNewBill = this.document.querySelector(`form[data-testid="form-new-bill"]`)
         formNewBill.addEventListener("submit", this.handleSubmit)
         const file = this.document.querySelector(`input[data-testid="file"]`)
@@ -19,7 +18,6 @@ export default class NewBill {
 
     handleChangeFile = async(e) => {
         e.preventDefault()
-            // console.log(e.target.value);
         const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
             //const filePath = e.target.value.split(/\\/g)
         const fileName = file.name; //filePath[filePath.length - 1]
@@ -27,9 +25,7 @@ export default class NewBill {
         const email = JSON.parse(localStorage.getItem("user")).email
         formData.append('file', file)
         formData.append('email', email)
-        this.fileName = "Autre chose";
-        // console.log("---->>>");
-        // console.log(fileName);
+            // this.fileName = "Autre chose";
 
         //for display an error when a file  extenction not allowed
         const ext = fileName.split `.`;
@@ -52,7 +48,6 @@ export default class NewBill {
                 }
             })
             .then(({ fileName, fileUrl, key }) => {
-                // console.log(fileName)
                 this.billId = key
                 this.fileUrl = fileUrl
                 this.fileName = fileName
