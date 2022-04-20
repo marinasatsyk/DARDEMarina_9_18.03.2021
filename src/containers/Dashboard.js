@@ -74,7 +74,7 @@ export default class {
         this.onNavigate = onNavigate
         this.store = store
         this.selected = null;
-        this.opened = [false, false, false];
+        this.opened = [false, false, false, false];
         $('#arrow-icon1').click((e) => this.handleShowTickets(e, bills, 1))
         $('#arrow-icon2').click((e) => this.handleShowTickets(e, bills, 2))
         $('#arrow-icon3').click((e) => this.handleShowTickets(e, bills, 3))
@@ -92,17 +92,21 @@ export default class {
         // if (this.counter === undefined || this.id !== bill.id) this.counter = 0
         // if (this.id === undefined || this.id !== bill.id) this.id = bill.id
         // if (this.counter % 2 === 0) {
-        if (this.selected === null || this.selected !== bill) {
+        const oldSelected = this.selected;
+        const newSelected = bill;
+        if (oldSelected === null || oldSelected !== newSelected) {
+            // unselect all bills
             bills.forEach(b => {
-                $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
-            })
-            $(`#open-bill${bill.id}`).css({ background: '#2A2B35' })
-            $('.dashboard-right-container div').html(DashboardFormUI(bill))
+                    $(`#open-bill${b.id}`).css({ background: '#0D5AE5' })
+                })
+                // open selected bill
+            $(`#open-bill${newSelected.id}`).css({ background: '#2A2B35' })
+            $('.dashboard-right-container div').html(DashboardFormUI(newSelected))
             $('.vertical-navbar').css({ height: '150vh' })
-            this.selected = bill;
+                // updated selected variable
+            this.selected = newSelected;
         } else {
             $(`#open-bill${bill.id}`).css({ background: '#0D5AE5' })
-
             $('.dashboard-right-container div').html(`
               <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
             `)
@@ -135,15 +139,18 @@ export default class {
     }
 
     handleShowTickets(e, bills, index) {
-        const i = index - 1;
-        this.opened[i] = !this.opened[i];
+        // Swap Boolean value :false-> true / true->false
+        this.opened[index] = !this.opened[index]; // toggle
+
         const filtered = filteredBills(bills, getStatus(index));
         this.index = index;
-        if (this.opened[i]) {
+        if (this.opened[index]) {
+            // if opened -> show cards
             $(`#arrow-icon${index}`).css({ transform: 'rotate(0deg)' })
             $(`#status-bills-container${index}`)
                 .html(cards(filtered))
         } else {
+            // if closed -> display nothing
             $(`#arrow-icon${index}`).css({ transform: 'rotate(90deg)' })
             $(`#status-bills-container${index}`)
                 .html("")

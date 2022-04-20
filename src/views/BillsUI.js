@@ -21,13 +21,17 @@ const row = (bill) => {
 
 const rows = (data) => {
     if (data && data.length) {
+
         //we copy data in the other variable for sort 
         const dataForSort = [...data];
         // sort data by date
         dataForSort.sort(function(a, b) {
-                return new Date(b.date) - new Date(a.date);
-            })
-            // returns bills formated as String
+            const dateA = a.dateOrigin ? a.dateOrigin : a.date;
+            const dateB = b.dateOrigin ? b.dateOrigin : b.date;
+            return new Date(dateB) - new Date(dateA);
+        })
+
+        // returns bills formated as String
         return dataForSort.map(bill => row(bill)).join("");
     } else { return ""; }
 }

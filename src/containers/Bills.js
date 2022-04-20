@@ -52,9 +52,11 @@ export default class {
                             try {
                                 return {
                                     ...doc,
+                                    dateOrigin: doc.date,
+                                    // formatDate : ne fonctionne pas -> 'jui'n ==='jui'llet
+                                    // new Date(date) -> ne fonctionne pas pour toutes les dates.
                                     date: formatDate(doc.date),
                                     status: formatStatus(doc.status),
-
                                 }
                             } catch (e) {
                                 // if for some reason, corrupted data was introduced, we manage here failing formatDate function
@@ -62,6 +64,7 @@ export default class {
                                 console.log(e, 'for', doc)
                                 return {
                                     ...doc,
+                                    dateOrigin: doc.date,
                                     date: doc.date,
                                     status: formatStatus(doc.status)
                                 }
