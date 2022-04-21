@@ -80,7 +80,7 @@
              "fileName": "bill-abcde.jpg",
              "fileUrl": "http://localhost:5678/public/4b392f446047ced066990b0627cfa444",
              "id": "7to5QJDw6o4XWK9Wsjs7Go",
-             "name": "Hôtel du centre ville",
+             "name": "Hôtel du centre ville1",
              "pct": 20,
              "status": "pending",
              "type": "Hôtel et logement",

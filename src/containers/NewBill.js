@@ -13,22 +13,21 @@ export default class NewBill {
         this.fileUrl = null
         this.fileName = null
         this.billId = null
+        this.formData = null
         new Logout({ document, localStorage, onNavigate })
     }
 
     handleChangeFile = async(e) => {
         e.preventDefault()
-        const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
-            //const filePath = e.target.value.split(/\\/g)
-        const fileName = file.name; //filePath[filePath.length - 1]
+        const file = this.document.querySelector(`input[data-testid="file"]`).files[0];
+        //const filePath = e.target.value.split(/\\/g)
         const formData = new FormData()
         const email = JSON.parse(localStorage.getItem("user")).email
         formData.append('file', file)
         formData.append('email', email)
-            // this.fileName = "Autre chose";
 
         //for display an error when a file  extenction not allowed
-        const ext = fileName.split `.`;
+        const ext = file.name.split `.`;
         if (ext.length < 1 || (ext[ext.length - 1] !== "jpg" && ext[ext.length - 1] !== "jpeg" && ext[ext.length - 1] !== "png")) {
             this.document.querySelector("#id-file-error").textContent = "erreur de format";
             this.document.querySelector("#id-file-error").style.display = "block"
@@ -38,23 +37,11 @@ export default class NewBill {
             this.document.querySelector("#id-file-error").textContent = "";
             this.document.querySelector("#id-file-error").style.display = "none"
         }
-
-        await this.store
-            .bills()
-            .create({
-                data: formData,
-                headers: {
-                    noContentType: true
-                }
-            })
-            .then(({ fileName, fileUrl, key }) => {
-                this.billId = key
-                this.fileUrl = fileUrl
-                this.fileName = fileName
-            }).catch(error => console.error(error))
+        this.formData = formData;
+        this.fileName = file.name;
     }
 
-    handleSubmit = e => {
+    handleSubmit = async e => {
         e.preventDefault()
         console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)
         const email = JSON.parse(localStorage.getItem("user")).email
@@ -71,8 +58,23 @@ export default class NewBill {
             fileName: this.fileName,
             status: 'pending'
         }
-        this.updateBill(bill)
-        this.onNavigate(ROUTES_PATH['Bills'])
+
+        await this.store
+            .bills()
+            .create({
+                data: this.formData,
+                headers: {
+                    noContentType: true
+                }
+            })
+            .then(({ fileName, fileUrl, key }) => {
+                this.billId = key;
+                this.fileUrl = fileUrl;
+                this.fileName = fileName;
+                this.updateBill(bill);
+                //this.onNavigate(ROUTES_PATH['Bills'])
+            })
+            .catch(error => console.error(error))
     }
 
     // not need to cover this function by tests

@@ -48,6 +48,7 @@ describe("Given I am connected as an employee on NewBill Page", () => {
         //variables for create one newBill 
         const inputData = {
             file: "bill-abcde.jpg",
+            file2: "bill-replaced.png"
         };
         var handleChangeFile;
 
@@ -82,13 +83,16 @@ describe("Given I am connected as an employee on NewBill Page", () => {
             expect(handleChangeFile).toHaveBeenCalled();
         })
 
-        test("when a file is changed then newBill contains file data", () => {
+        test("it should create a file attachment and update the fileName attribute", () => {
             expect(newBill.fileName).toEqual(inputData.file);
+            console.log(newBill.fileName);
         })
 
 
 
-        test("when I  click submit newBill form It displays bill page", () => {
+        test("when I  click submit newBill form It displays bill page (method 'POST')", async() => {
+
+            var SpyHandleSubmit;
 
             const inputData = {
                 vat: "20",
@@ -111,6 +115,7 @@ describe("Given I am connected as an employee on NewBill Page", () => {
             const vat = screen.getByTestId("vat");
             const pct = screen.getByTestId("pct");
             const commentary = screen.getByTestId("commentary");
+
             //we do a simulation of the input actions of user in order to populate the fields required
             fireEvent.change(type, { target: { value: inputData.type } });
             fireEvent.change(name, { target: { value: inputData.name } });
@@ -120,16 +125,23 @@ describe("Given I am connected as an employee on NewBill Page", () => {
             fireEvent.change(pct, { target: { value: inputData.pct } });
             fireEvent.change(commentary, { target: { value: inputData.commentary } });
 
-            //we have to spy the fucntion being check
-            const SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit");
+            //we have to spy the function being check
+            SpyHandleSubmit = jest.spyOn(newBill, "handleSubmit");
             form.addEventListener("submit", newBill.handleSubmit);
             fireEvent.submit(form);
 
             expect(SpyHandleSubmit).toHaveBeenCalled();
+
             //we check if the page of bills opened
-            expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+            await waitFor(() => {
+                expect(screen.getByText("Mes notes de frais")).toBeTruthy();
+                expect(newBill.fileName).toEqual('bill-abcde.jpg');
+                expect(newBill.billId).toEqual('1234');
+            })
 
         })
+
+
 
     })
 

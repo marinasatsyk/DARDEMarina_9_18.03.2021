@@ -73,7 +73,8 @@ export default class Login {
                 .login(JSON.stringify({
                     email: user.email,
                     password: user.password,
-                })).then(({ jwt }) => {
+                }))
+                .then(({ jwt }) => {
                     localStorage.setItem('jwt', jwt)
                 })
         } else {

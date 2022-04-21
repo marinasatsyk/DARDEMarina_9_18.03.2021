@@ -29,7 +29,7 @@ describe("Given I am connected as an employee", () => {
             window.onNavigate(ROUTES_PATH.Bills)
             await waitFor(() => screen.getByTestId('icon-window'))
             const windowIcon = screen.getByTestId('icon-window')
-
+                //add selecori witch contans the class active
             expect(windowIcon.classList.contains("active-icon")).toBeTruthy();
 
         })
@@ -184,7 +184,7 @@ describe("Given I am connected as an employee", () => {
             expect(buttonNewBill).toBeTruthy();
 
             buttonNewBill.addEventListener("click", bill.handleClickNewBill);
-            userEvent.click(buttonNewBill)
+            userEvent.click(buttonNewBill);
 
             expect(screen.getByText("Envoyer une note de frais")).toBeTruthy();
         })
@@ -249,14 +249,16 @@ describe("Given I am connected as an employee", () => {
                 localStorage: window.localStorage
             })
 
+            var errorOccured = false;
             try {
-                await bill.getBills()
-                expect(false).toBeTruthy();
+                // we a failed store it MUST generate an error
+                await bill.getBills();
             } catch (err) {
-                expect(true).toBeTruthy();
-                expect(false).not.toBeTruthy();
-
+                // if we reach this point, the error has been caught (this is was it expected)
+                errorOccured = true;
             }
+
+            expect(errorOccured).toBeTruthy();
         })
     })
 
